@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Example</title>
+    <style>
+        /* CSS để định dạng bảng và modal */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* CSS cho modal */
+        .modal {
+            display: none; /* Ẩn modal mặc định */
+            position: fixed; /* Hiển thị modal cố định trên màn hình */
+            z-index: 1; /* Đảm bảo modal hiển thị trên các phần tử khác */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5); /* Màu nền mờ */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Bảng ban đầu -->
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Action</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>John Doe</td>
+        <td><a href="#" id="openModal">View Details</a></td>
+    </tr>
+    <!-- Các hàng khác -->
+</table>
+
+<!-- Modal chứa bảng khác -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <table>
+            <tr>
+                <th>Detail</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <td>Age</td>
+                <td>30</td>
+            </tr>
+            <tr>
+                <td>Address</td>
+                <td>123 Street</td>
+            </tr>
+            <!-- Các thông tin khác -->
+        </table>
+    </div>
+</div>
+
+<script>
+    // JavaScript để mở modal khi nhấp vào link
+    var modal = document.getElementById("myModal");
+    var btn = document.getElementById("openModal");
+    var span = document.getElementsByClassName("close")[0];
+
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    // Đóng modal khi nhấp vào nút "x"
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // Đóng modal khi nhấp vào bất kỳ đâu bên ngoài modal
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
+
+</body>
+</html>

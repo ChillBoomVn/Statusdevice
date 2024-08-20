@@ -1,0 +1,213 @@
+{% extends "index.html"%}
+{% block content %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home Page</title>
+    <link
+      rel="stylesheet"
+      href="{{url_for('static',filename='styles/style.css')}}"
+    />
+    <style> 
+      /* CSS cho modal */
+      .modal {
+          display: none;
+          position: fixed;
+          z-index: 1;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          overflow: auto;
+          background-color: rgba(0,0,0,0.5);
+      }
+      .modal-content {
+          background-color: #fefefe;
+          margin: 15% auto;
+          padding: 20px;
+          border: 1px solid #888;
+          width: 80%;
+      }
+      .close {
+          color: #aaa;
+          float: right;
+          font-size: 28px;
+          font-weight: bold;
+      }
+      .close:hover,
+      .close:focus {
+          color: black;
+          text-decoration: none;
+          cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1 class="homename">HomePage</h1>
+    <div class="table_status">
+      <form action="#" method="post">
+        {% if items %}
+    <table style="border-collapse: collapse; width: 100%">
+        <thead>
+            <tr>
+                <td>Device ID</th>
+                <td>CPU</td>
+                <td>RAM</td>
+                <td>CPU Temp</td>
+                <td>Ticket ID</td>
+                <td>Detect In</td>
+                <td>Uptime</td>
+                <td>DB Size</td>
+                <td>IP</td>
+                <td>MAC</td>
+                <td>Note</td>
+                <td>Updated At</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+              <td><a href="#" onclick="openModal('{{ item.deviceID }}', '{{ item.cpu }}', '{{ item.ram }}', '{{ item.cpuTemp }}', '{{ item.ticket_id }}', '{{ item.detect_in }}', '{{ item.uptime }}', '{{ item.db_size }}', '{{ item.IP }}', '{{ item.MAC }}','{{ item.note }}')">{{ item.deviceID }}</a></td>
+                <td>{{ item.cpu }}</td>
+                <td>{{ item.ram }}</td>
+                <td>{{ item.cpuTemp }}</td>
+                <td>{{ item.ticket_id }}</td>
+                <td>{{ item.detect_in }}</td>
+                <td>{{ item.uptime }}</td>
+                <td>{{ item.db_size }}</td>
+                <td>{{ item.IP }}</td>
+                <td>{{ item.MAC }}</td>
+                <td>{{ item.note }}</td>
+                <td>{{ item.updated_at.strftime('%H:%M %d-%m-%Y ') }}</td>
+            </tr>
+            {% endfor %}
+            
+        </tbody>
+    </table>
+    {% else %}
+    <p>No data available.</p>
+    {% endif %}
+    <!-- Phân trang cho webpage với html -->
+    <ul class="pagination justify-content-center" style="margin:20px 0">
+      {% if pagination.has_prev %}
+          <li class="page-item">
+              <a class="page-link" href="{{ url_for('latest_records', page=pagination.prev_num) }}">Previous</a>
+          </li>
+      {% else %}
+          <li class="page-item disabled">
+              <a class="page-link" href="#">Previous</a>
+          </li>
+      {% endif %}
+      <!-- left_edge=2: Hiển thị 2 số trang đầu tiên.
+      right_edge=2: Hiển thị 2 số trang cuối cùng.
+      left_current=2: Hiển thị 2 số trang trước trang hiện tại.
+      right_current=2: Hiển thị 2 số trang sau trang hiện tại. -->
+      {% for page_num in pagination.iter_pages(left_edge=3, right_edge=1, left_current=0, right_current=0) %}
+          {% if page_num %}
+              {% if page_num == pagination.page %}
+                  <li class="page-item active"><a class="page-link" href="#">{{ page_num }}</a></li>
+              {% else %}
+                  <li class="page-item"><a class="page-link" href="{{ url_for('latest_records', page=page_num) }}">{{ page_num }}</a></li>
+              {% endif %}
+          {% else %}
+              <li class="page-item disabled"><a class="page-link" href="#">…</a></li>
+          {% endif %}
+      {% endfor %}
+  
+      {% if pagination.has_next %}
+          <li class="page-item">
+              <a class="page-link" href="{{ url_for('latest_records', page=pagination.next_num) }}">Next</a>
+          </li>
+      {% else %}
+          <li class="page-item disabled">
+              <a class="page-link" href="#">Next</a>
+          </li>
+      {% endif %}
+  </ul>
+  
+  
+      </form>
+      <!-- Modal -->
+      <div id="myModal" class="modal">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <table>
+            <thead>
+              <tr>
+                <td>Device ID</td>
+                <td>CPU</td>
+                <td>RAM</td>
+                <td>CPU Temp</td>
+                <td>Ticket ID</td>
+                <td>Detect In</td>
+                <td>Uptime</td>
+                <td>DB Size</td>
+                <td>IP</td>
+                <td>MAC</td>
+                <td>Note</td>
+                <td>Updated At</td>
+              </tr>
+            </thead>
+            <tbody id="modal-content-body">
+              <!-- Nội dung modal sẽ được cập nhật ở đây -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+  
+      <script>
+        // JavaScript để mở modal khi nhấp vào link
+        var modal = document.getElementById("myModal");
+        var span = document.getElementsByClassName("close")[0];
+  
+        function openModal(deviceID) {
+          // Gửi yêu cầu AJAX để lấy dữ liệu cho deviceID cụ thể
+          fetch(`/device_records/${deviceID}`)
+            .then(response => response.json())
+            .then(data => {
+              // Tạo nội dung cho modal dựa trên dữ liệu được trả về
+              var content = data.map(record => `
+                <tr>
+                  <td>${record.deviceID}</td>
+                  <td>${record.cpu}</td>
+                  <td>${record.ram}</td>
+                  <td>${record.cpuTemp}</td>
+                  <td>${record.ticket_id}</td>
+                  <td>${record.detect_in}</td>
+                  <td>${record.uptime}</td>
+                  <td>${record.db_size}</td>
+                  <td>${record.IP}</td>
+                  <td>${record.MAC}</td>
+                  <td>${record.note}</td>
+                  <td>${record.updated_at}</td>
+                </tr>
+              `).join('');
+              
+              // Gắn nội dung vào phần body của modal
+              document.getElementById("modal-content-body").innerHTML = content;
+  
+              // Hiển thị modal
+              modal.style.display = "block";
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+        }
+  
+        // Đóng modal khi nhấp vào nút "x"
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+  
+        // Đóng modal khi nhấp vào bất kỳ đâu bên ngoài modal
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+      </script>
+  </body>
+</html>
+{% endblock %}

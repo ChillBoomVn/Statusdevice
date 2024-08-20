@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latest Records</title>
+</head>
+<body>
+    <h1>Latest Records for Each Device ID</h1>
+    {% if items %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Device ID</th>
+                <th>CPU</th>
+                <th>RAM</th>
+                <th>CPU Temp</th>
+                <th>Ticket ID</th>
+                <th>Detect In</th>
+                <th>Uptime</th>
+                <th>DB Size</th>
+                <th>IP</th>
+                <th>MAC</th>
+                <th>Note</th>
+                <th>Updated At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.deviceID }}</td>
+                <td>{{ item.cpu }}</td>
+                <td>{{ item.ram }}</td>
+                <td>{{ item.cpuTemp }}</td>
+                <td>{{ item.ticket_id }}</td>
+                <td>{{ item.detect_in }}</td>
+                <td>{{ item.uptime }}</td>
+                <td>{{ item.db_size }}</td>
+                <td>{{ item.IP }}</td>
+                <td>{{ item.MAC }}</td>
+                <td>{{ item.note }}</td>
+                <td>{{ item.updated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No data available.</p>
+    {% endif %}
+</body>
+</html>
